@@ -4,4 +4,4 @@ Fraud detection ML system
 
 ### System Design
 
-![System Design](images/Fraud Detection System Design.png)
+![System Design](images/fraud_detection_system_design.png)
