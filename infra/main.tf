@@ -4,6 +4,7 @@ provider "aws" {
 
 locals {
   bucket_name = "fraud-detection-system"
+  user_arn = ["arn:aws:iam::061051215402:user/fraud-detection-system",]
   tags = {
     project = "fraud-detection-system"
   }
@@ -23,13 +24,6 @@ module "iam" {
   tags = local.tags
   bucket_name = module.base.bucket_name 
   bucket_arn = module.base.bucket_arn
-}
-
-resource "aws_iam_user" "spacelift_user" {
-  name = "spacelift-user"
-}
-
-resource "aws_iam_user_login_profile" "spacelift_user_login_profile" {
-  user = aws_iam_user.spacelift_user.name
+  user_arn = local.user_arn
 }
 
