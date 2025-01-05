@@ -9,14 +9,15 @@ transaction data feeding to the trained model using Kafka.
 Date: 2025-01-04
 """
 
-import os
 from hashlib import sha256
 from pathlib import Path
 
 import kaggle
 import polars as pl
-import s3fs
+import s3
 from rich import print
+
+from .constants import SENSITIVE_COLS
 
 
 def extract_from_kaggle() -> None:
@@ -36,10 +37,8 @@ def extract_from_kaggle() -> None:
     train_df = pl.read_parquet("data/fraudTrain.parquet")
     test_df = pl.read_parquet("data/fraudTest.parquet")
 
-    sensitive_cols = ["first", "last", "cc_num", "dob"]
-
     train_data, test_data = _generate_customer_id(
-        train_df=train_df, test_df=test_df, sensitive_cols=sensitive_cols
+        train_df=train_df, test_df=test_df, sensitive_cols=SENSITIVE_COLS
     )
 
     train_data.write_parquet("data/fraudTrain.parquet")
@@ -53,7 +52,7 @@ def extract_from_kaggle() -> None:
     BUCKET = "fraud-detection-system"
 
     for input, output in paths:
-        _upload_to_s3(bucket=BUCKET, input=input, output=output)
+        s3.write(bucket=BUCKET, input=input, output=output)
 
 
 def _download_data() -> None:
@@ -121,20 +120,6 @@ def _generate_customer_id(
     assert len(test_df) == len(test_data)
 
     return train_data, test_data
-
-
-def _upload_to_s3(bucket: str, input: str, output: str) -> None:
-    print(f"Uploading {input} to s3://{bucket}/{output}")
-
-    fs = s3fs.S3FileSystem(
-        key=os.getenv("AWS_ACCESS_KEY_ID"),
-        secret=os.getenv("AWS_SECRET_ACCESS_KEY"),
-        anon=False,
-    )
-    # fs.put(input, output)
-    with fs.open(f"s3://{bucket}/{output}", "wb") as f:
-        with open(input, "rb") as file:
-            f.write(file.read())
 
 
 if __name__ == "__main__":
