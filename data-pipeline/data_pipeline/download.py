@@ -14,10 +14,10 @@ from pathlib import Path
 
 import kaggle
 import polars as pl
-import s3
 from rich import print
 
-from .constants import SENSITIVE_COLS
+from .constants import BUCKET, PROD_DATA, RAW_TRAINING_DATA, SENSITIVE_COLS
+from .s3 import write_parquet
 
 
 def extract_from_kaggle() -> None:
@@ -41,18 +41,8 @@ def extract_from_kaggle() -> None:
         train_df=train_df, test_df=test_df, sensitive_cols=SENSITIVE_COLS
     )
 
-    train_data.write_parquet("data/fraudTrain.parquet")
-    test_data.write_parquet("data/fraudTest.parquet")
-
-    paths = [
-        ("data/fraudTrain.parquet", "raw/training.parquet"),
-        ("data/fraudTest.parquet", "production/prod.parquet"),
-    ]
-
-    BUCKET = "fraud-detection-system"
-
-    for input, output in paths:
-        s3.write(bucket=BUCKET, input=input, output=output)
+    write_parquet(train_data, bucket=BUCKET, table=RAW_TRAINING_DATA)
+    write_parquet(test_data, bucket=BUCKET, table=PROD_DATA)
 
 
 def _download_data() -> None:
