@@ -1,10 +1,7 @@
 import polars as pl
 
-from .base import base_s3
+from ..settings import storage_options
 
 
-def read_bucket(bucket: str, file: str) -> pl.DataFrame:
-    fs = base_s3()
-
-    with fs.open(f"s3://{bucket}/{file}", "rb") as f:
-        return pl.read_parquet(f)
+def read_parquet(bucket: str, file: str) -> pl.DataFrame:
+    return pl.read_parquet(f"s3://{bucket}/{file}", storage_options=storage_options)
