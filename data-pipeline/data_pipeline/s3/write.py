@@ -1,11 +1,20 @@
-from .base import base_s3
+import polars as pl
+
+from ..settings import storage_options
 
 
-def write_bucket(bucket: str, input: str, output: str) -> None:
-    print(f"Uploading {input} to s3://{bucket}/{output}")
+def write_parquet(df: pl.DataFrame, bucket: str, table: str) -> None:
+    print(f"Uploading {df} to s3://{bucket}/{table}")
 
-    fs = base_s3()
+    df.write_parquet(
+        f"s3://{bucket}/{table}",
+        storage_options=storage_options,
+    )
 
-    with fs.open(f"s3://{bucket}/{output}", "wb") as f:
-        with open(input, "rb") as file:
-            f.write(file.read())
+
+def write_deltalake(df: pl.DataFrame, bucket: str, table: str):
+    print(f"Uploading {df} to s3://{bucket}/{table}")
+    df.write_delta(
+        f"s3://{bucket}/{table}",
+        storage_options=storage_options,
+    )
