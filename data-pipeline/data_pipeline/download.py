@@ -14,10 +14,12 @@ from pathlib import Path
 
 import kaggle
 import polars as pl
-from rich import print
 
 from .constants import BUCKET, PROD_DATA, RAW_TRAINING_DATA, SENSITIVE_COLS
+from .logger import get_logger
 from .s3 import write_parquet
+
+logger = get_logger(__name__)
 
 
 def extract_from_kaggle() -> None:
@@ -44,21 +46,23 @@ def extract_from_kaggle() -> None:
     write_parquet(train_data, bucket=BUCKET, table=RAW_TRAINING_DATA)
     write_parquet(test_data, bucket=BUCKET, table=PROD_DATA)
 
+    logger.success("Data extraction completed")
+
 
 def _download_data() -> None:
     kaggle.api.authenticate()
 
-    print("creating path")
+    logger.info("creating data folder if it does not exist")
     Path("data").mkdir(exist_ok=True, parents=True)
 
-    print("downloading dataset from kaggle")
+    logger.info("downloading dataset from kaggle")
     kaggle.api.dataset_download_files(
         dataset="kartik2112/fraud-detection", path="data", unzip=True
     )
 
 
 def _convert_to_parquet(path: str | Path) -> None:
-    print(f"converting {path} to parquet")
+    logger.info(f"converting {path} to parquet")
 
     output = str(path).replace(".csv", ".parquet")
     pl.read_csv(path).write_parquet(file=output)
@@ -67,7 +71,7 @@ def _convert_to_parquet(path: str | Path) -> None:
 def _generate_customer_id(
     train_df: pl.DataFrame, test_df: pl.DataFrame, sensitive_cols: list[str]
 ) -> tuple[pl.DataFrame, pl.DataFrame]:
-    print("generating customer id")
+    logger.info("generating customer id")
 
     def __create_customer_id(row: dict) -> str:
         identifier = (
@@ -79,7 +83,7 @@ def _generate_customer_id(
         # Create deterministic hash
         return f"CUST_{sha256(identifier.encode()).hexdigest()[:16]}"
 
-    print("creating concatenating train and test data")
+    logger.info("creating concatenating train and test data")
     full_data = pl.concat(
         [
             train_df.with_columns(pl.lit("train").alias("original_split")),
@@ -87,7 +91,7 @@ def _generate_customer_id(
         ]
     )
 
-    print('mapping "create_customer_id" function to sensitive columns')
+    logger.info('mapping "create_customer_id" function to sensitive columns')
     processed_data = full_data.with_columns(
         pl.struct(sensitive_cols)
         .map_elements(lambda x: __create_customer_id(x), return_dtype=pl.String)
@@ -95,7 +99,7 @@ def _generate_customer_id(
     )
 
     # split data hack into train and test
-    print("splitting data back into train and test")
+    logger.info("splitting data back into train and test")
     train_data = processed_data.filter(pl.col("original_split") == "train").drop(
         "original_split"
     )
@@ -103,11 +107,15 @@ def _generate_customer_id(
         "original_split"
     )
 
-    print(
+    logger.info(
         'asserting "train_data" and "test_data" have the same length as "train_df" and "test_df"'
     )
-    assert len(train_df) == len(train_data)
-    assert len(test_df) == len(test_data)
+    assert len(train_df) == len(train_data), logger.error(
+        "train_df and train_data have different lengths"
+    )
+    assert len(test_df) == len(test_data), logger.error(
+        "test_df and test_data have different lengths"
+    )
 
     return train_data, test_data
 
