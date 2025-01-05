@@ -8,6 +8,7 @@ dependencies = [
     "ipykernel>=6.29.5",
     "kaggle>=1.6.17",
     "polars>=1.19.0",
+    "pydantic-settings>=2.7.1",
     "rich>=13.9.4",
     "s3fs>=2024.12.0",
 ]
