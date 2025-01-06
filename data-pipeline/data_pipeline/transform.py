@@ -1,7 +1,6 @@
 from functools import reduce
 
 import polars as pl
-from rich import print
 
 from .constants import SENSITIVE_COLS
 from .logger import get_logger
