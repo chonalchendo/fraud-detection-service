@@ -8,6 +8,10 @@ from .logger import get_logger
 logger = get_logger(__name__)
 
 
+class EmptyDataFrameError(Exception):
+    pass
+
+
 def transform(df: pl.DataFrame) -> pl.DataFrame:
     """
     Main function to preprocess each dataset. Each transformer passed in the
@@ -15,6 +19,10 @@ def transform(df: pl.DataFrame) -> pl.DataFrame:
     the `reduce` function.
     """
     logger.info("----- Transforming dataset -----")
+
+    if df.is_empty():
+        logger.error("Dataframe is empty before transformation")
+        raise EmptyDataFrameError
 
     transformers = [
         _rename_columns,
@@ -27,6 +35,7 @@ def transform(df: pl.DataFrame) -> pl.DataFrame:
 
     if df.is_empty():
         logger.error("Dataframe is empty after transformation")
+        raise EmptyDataFrameError
 
     logger.success("Data transformation completed")
     return df
