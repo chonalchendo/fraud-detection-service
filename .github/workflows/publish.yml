@@ -18,9 +18,9 @@ jobs:
         with:
           python-version: "3.12"
   
-      - name: Install the project
-        run: uv sync --all-extras --dev
-
+      # - name: Install the project
+      #   run: uv sync --all-extras --dev
+      #
       - name: Run tests
         run: make run-tests 
         continue-on-error: false
