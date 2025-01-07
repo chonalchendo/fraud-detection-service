@@ -39,7 +39,7 @@ def extract_from_kaggle() -> None:
     train_df = pl.read_parquet("data/fraudTrain.parquet")
     test_df = pl.read_parquet("data/fraudTest.parquet")
 
-    train_data, test_data = _generate_customer_id(
+    train_data, test_data = _generate_customer_ids(
         train_df=train_df, test_df=test_df, sensitive_cols=SENSITIVE_COLS
     )
 
@@ -68,44 +68,24 @@ def _convert_to_parquet(path: str | Path) -> None:
     pl.read_csv(path).write_parquet(file=output)
 
 
-def _generate_customer_id(
+def _generate_customer_ids(
     train_df: pl.DataFrame, test_df: pl.DataFrame, sensitive_cols: list[str]
 ) -> tuple[pl.DataFrame, pl.DataFrame]:
     logger.info("generating customer id")
 
-    def __create_customer_id(row: dict) -> str:
-        identifier = (
-            f"{str(row['first']).lower().strip()}"
-            f"{str(row['last']).lower().strip()}"
-            f"{str(row['cc_num']).strip()}"
-            f"{str(row['dob'])}"
-        )
-        # Create deterministic hash
-        return f"CUST_{sha256(identifier.encode()).hexdigest()[:16]}"
-
     logger.info("creating concatenating train and test data")
-    full_data = pl.concat(
-        [
-            train_df.with_columns(pl.lit("train").alias("original_split")),
-            test_df.with_columns(pl.lit("test").alias("original_split")),
-        ]
-    )
+    full_data = _merge_datasets(train_df, test_df)
 
     logger.info('mapping "create_customer_id" function to sensitive columns')
     processed_data = full_data.with_columns(
         pl.struct(sensitive_cols)
-        .map_elements(lambda x: __create_customer_id(x), return_dtype=pl.String)
+        .map_elements(lambda x: _create_customer_id(x), return_dtype=pl.String)
         .alias("customer_id")
     )
 
     # split data hack into train and test
     logger.info("splitting data back into train and test")
-    train_data = processed_data.filter(pl.col("original_split") == "train").drop(
-        "original_split"
-    )
-    test_data = processed_data.filter(pl.col("original_split") == "test").drop(
-        "original_split"
-    )
+    train_data, test_data = _split_datasets(processed_data)
 
     logger.info(
         'asserting "train_data" and "test_data" have the same length as "train_df" and "test_df"'
@@ -118,6 +98,42 @@ def _generate_customer_id(
     )
 
     return train_data, test_data
+
+
+def _split_datasets(full_data: pl.DataFrame) -> tuple[pl.DataFrame, pl.DataFrame]:
+    train_data = full_data.filter(pl.col("original_split") == "train").drop(
+        "original_split"
+    )
+    test_data = full_data.filter(pl.col("original_split") == "test").drop(
+        "original_split"
+    )
+    return train_data, test_data
+
+
+def _merge_datasets(train_df: pl.DataFrame, test_df: pl.DataFrame) -> pl.DataFrame:
+    full_data = pl.concat(
+        [
+            train_df.with_columns(pl.lit("train").alias("original_split")),
+            test_df.with_columns(pl.lit("test").alias("original_split")),
+        ]
+    )
+
+    assert len(full_data) == len(train_df) + len(test_df), logger.error(
+        "full_data has different length than train_df + test_df"
+    )
+
+    return full_data
+
+
+def _create_customer_id(row: dict) -> str:
+    identifier = (
+        f"{str(row['first']).lower().strip()}"
+        f"{str(row['last']).lower().strip()}"
+        f"{str(row['cc_num']).strip()}"
+        f"{str(row['dob'])}"
+    )
+    # Create deterministic hash
+    return f"CUST_{sha256(identifier.encode()).hexdigest()[:16]}"
 
 
 if __name__ == "__main__":
