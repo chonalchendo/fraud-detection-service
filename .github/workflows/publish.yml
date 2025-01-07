@@ -1,5 +1,4 @@
 name: Build and publish packages to AWS CodeArtifact
-run_name: ${{ github.actor }} is building and publishing packages
 on:
   push:
     branches: [ main ]
