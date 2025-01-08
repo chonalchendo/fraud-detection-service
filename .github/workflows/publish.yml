@@ -14,9 +14,20 @@ jobs:
     defaults:
       run:
         working-directory: ${{ matrix.package }}
-
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_DOMAIN: ${{ secrets.AWS_CODEARTIFACT_DOMAIN }}
+      AWS_CODEARTIFACT_REPOSITORY: ${{ secrets.AWS_CODEARTIFACT_REPOSITORY }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -37,6 +48,19 @@ jobs:
         run: uv build 
         continue-on-error: false
 
-      - name: Publish package
-        run: uv publish
-        continue-on-error: false
+      - name: Configure and publish to CodeArtifact 
+        run: |
+          export AWS_CODEARTIFACT_TOKEN="$(
+              aws codeartifact get-authorization-token \
+              --domain $AWS_DOMAIN \
+              --domain-owner $AWS_ACCOUNT_ID \
+              --query authorizationToken \
+              --output text
+          )"
+          export UV_EXTRA_INDEX_URL="https://aws:${AWS_CODEARTIFACT_TOKEN}@${AWS_DOMAIN}-${AWS_ACCOUNT_ID}.d.codeartifact.${AWS_REGION}.amazonaws.com/pypi/${AWS_CODEARTIFACT_REPOSITORY}/simple/"
+          export UV_PUBLISH_URL="https://${AWS_DOMAIN}-${AWS_ACCOUNT_ID}.d.codeartifact.${AWS_REGION}.amazonaws.com/pypi/${AWS_CODEARTIFACT_REPOSITORY}/"
+          export UV_PUBLISH_USERNAME=aws
+          export UV_PUBLISH_PASSWORD="$AWS_CODEARTIFACT_TOKEN"
+
+          uv publish
+
