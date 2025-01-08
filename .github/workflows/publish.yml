@@ -30,9 +30,13 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Run tests
-        run: make run-tests 
+        run: uv run pytest tests 
         continue-on-error: false
 
-      - name: Build and publish packages
-        run: make publish-packages
+      - name: Build package
+        run: uv build 
+        continue-on-error: false
+
+      - name: Publish package
+        run: uv publish
         continue-on-error: false
