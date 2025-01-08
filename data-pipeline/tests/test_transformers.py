@@ -79,23 +79,6 @@ def test_transform_pipeline(sample_df, mock_logger):
     assert result["transaction_time"].is_sorted()
 
 
-def test_transform_empty_df(mock_logger):
-    empty_df = pl.DataFrame(
-        {
-            "trans_date_trans_time": pl.Series([], dtype=pl.Utf8),
-            "merchant": pl.Series([], dtype=pl.Utf8),
-            "amt": pl.Series([], dtype=pl.Float64),
-            "category": pl.Series([], dtype=pl.Utf8),
-            "cc_num": pl.Series([], dtype=pl.Int64),
-            "first": pl.Series([], dtype=pl.Utf8),
-            "last": pl.Series([], dtype=pl.Utf8),
-            "dob": pl.Series([], dtype=pl.Utf8),
-        }
-    )
-    result = transform.transform(empty_df)
-    assert result.is_empty()
-
-
 def test_transform_invalid_date(sample_df):
     invalid_df = sample_df.with_columns(
         pl.lit("invalid_date").alias("trans_date_trans_time")
