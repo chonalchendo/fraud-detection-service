@@ -43,7 +43,7 @@ resource "aws_codeartifact_domain" "domain" {
 
 resource "aws_codeartifact_repository" "python_packages" {
   repository = var.codeartifact_repository # repository name
-  domain     = aws_codeartifact_domain.domain.domain
+  domain     = var.codeartifact_domain 
 
   external_connections {
     external_connection_name = "public:pypi"  # For Python packages
@@ -66,4 +66,12 @@ output "codeartifact_domain" {
 
 output "codeartifact_repository" {
   value = aws_codeartifact_repository.python_packages.repository
+}
+
+output "codeartifact_repo_arn" {
+  value = aws_codeartifact_repository.python_packages.arn
+}
+
+output "codeartifact_domain_arn" {
+  value = aws_codeartifact_domain.domain.arn
 }
