@@ -1,4 +1,4 @@
-# Product & System Design for Real-Time Fraud Detection System
+# Product & System Design for Real-Time Fraud Detection System
 
 # Intro
 
@@ -107,7 +107,7 @@ Data sample:
 
 Now we know the what and the why, we can start to design our ML system to answer _how_ we will build our solution.
 
-![[fraud_detection_system_design.png]]
+![[./img/fraud_detection_system_design.png]]
 
 The system diagram above shows a rough outline of how this system will be deployed (the diagram will likely be subject to change as the project evolves).
 
@@ -141,7 +141,7 @@ For the purpose of this exercise, the `fraudTrain.csv` data will be split into t
 
 - combination of numeric and text features that describe the transaction made including location, customer details, and transaction type
 
-# Metrics
+## Metrics
 
 _Prioritise key metrics that reflect the objectives_
 
@@ -168,7 +168,7 @@ Based on the `confusion matrix` we can derive the following metrics:
 
 Precision tells us the proportion of fraudulent transactions we predicted as fraud. Recall measures the proportion of fraud cases we caught. F1 score provides a balance between precision and recall which is ideal for this system as we want a metric that reflects our accuracy of predicting fraudulent transactions, but also catching as many of them as possible.
 
-# Evaluation
+## Evaluation
 
 _Design offline and online evaluation criteria_
 
@@ -194,7 +194,7 @@ The adapt the system to data drift and performance degradation, new models will 
 
 As we have a latency requirement of 200ms, we need to evaluate the historical model latency performance.
 
-# Modelling
+## Modelling
 
 _List the iterative approach to model the task_
 
@@ -214,13 +214,13 @@ The general modelling approach I want to take it as follows:
 
 `reason`: ML models do not deal with class imbalance well so proper preparation is needed for our modelling framework to be successful
 
-# Inference
+## Inference
 
 _Decide whether we want to do batch (offline) or real-time (online) inference_
 
 Our client `Nexus Pay` need _real-time_ (online) predictions of fraudulent activity so that they can limit financial losses to their customers as quickly as possible.
 
-![[Online Fraud Detection System 1.png]]
+![[./img/online_fraud_detection_inference.png]]
 
 The above diagram is a high-level outline of how the online fraud detection system will work.
 
@@ -231,7 +231,7 @@ The above diagram is a high-level outline of how the online fraud detection syst
 5. The batch and real-time data are joined together at inference time to return the fraud prediction to the customer
 6. The customer gets a transaction approved or denied notification
 
-# Feedback
+## Feedback
 
 _Outline sources of feedback from our system to use for iteration_
 
