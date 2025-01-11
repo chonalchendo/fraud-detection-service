@@ -107,7 +107,7 @@ Data sample:
 
 Now we know the what and the why, we can start to design our ML system to answer _how_ we will build our solution.
 
-![[./img/fraud_detection_system_design.png]]
+![Fraud Detection System Design](./img/fraud_detection_system_design.png)
 
 The system diagram above shows a rough outline of how this system will be deployed (the diagram will likely be subject to change as the project evolves).
 
@@ -220,7 +220,7 @@ _Decide whether we want to do batch (offline) or real-time (online) inference_
 
 Our client `Nexus Pay` need _real-time_ (online) predictions of fraudulent activity so that they can limit financial losses to their customers as quickly as possible.
 
-![[./img/online_fraud_detection_inference.png]]
+![Online Fraud Detection Inference Diagram](./img/online_fraud_detection_inference.png)
 
 The above diagram is a high-level outline of how the online fraud detection system will work.
 
