@@ -13,7 +13,7 @@ jobs:
         package: [data-pipeline]
     defaults:
       run:
-        working-directory: ${{ matrix.package }}
+        working-directory: packages/${{ matrix.package }}
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
