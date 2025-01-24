@@ -1,2 +1,2 @@
 #!/bin/bash
-python /app/src/stream.py
+python /app/src/main.py
