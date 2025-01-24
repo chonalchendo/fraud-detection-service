@@ -3,7 +3,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'data-pipeline/**'
+      - 'packages/data-pipeline/**'
   workflow_dispatch:
 jobs:
   publish:
