@@ -1,5 +1,11 @@
 import pandera.polars as pa
+import polars as pl
 from pandera.engines.polars_engine import Categorical, DateTime, Float64, Int64, String
+
+
+def validate_dataframe(df: pl.DataFrame) -> pl.DataFrame:
+    schema = ValidationModel.to_polars_schema()
+    return schema.validate(df)
 
 
 class ValidationModel(pa.DataFrameModel):
