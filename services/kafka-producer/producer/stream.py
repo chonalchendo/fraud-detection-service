@@ -30,32 +30,17 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-def create_stream(topic_name, servers):
-    topic_name = topic_name
+def create_stream(topic_name: str, servers: list[str]) -> None:
+    """
+    Main function to create a Kafka topic and emit events to it using
+    a Kafka producer.
 
-    producer = None
-    admin = None
-    for i in range(20):
-        try:
-            producer = KafkaProducer(bootstrap_servers=servers)
-            admin = KafkaAdminClient(bootstrap_servers=servers)
-            logger.info("SUCCESS: instantiated Kafka admin and producer")
-            break
-        except Exception as e:
-            logger.exception(
-                f"Trying to instantiate admin and producer with bootstrap servers {servers} with error {e}"
-            )
-            sleep(10)
-            pass
-
-    try:
-        # Create Kafka topic
-        topic = NewTopic(name=topic_name, num_partitions=3, replication_factor=1)
-        admin.create_topics([topic])
-        logger.info(f"Topic {topic_name} created")
-    except Exception as e:
-        logger.exception(str(e))
-        pass
+    Args:
+        topic_name (str): The name of the Kafka topic to create.
+        servers (list[str]): The list of Kafka servers to connect to.
+    """
+    producer, admin = init_producer(servers)
+    create_topic(admin, topic_name)
 
     logger.info("Reading parquet")
     df = pl.read_parquet(
@@ -67,6 +52,33 @@ def create_stream(topic_name, servers):
         producer.send(topic_name, json.dumps(record).encode())
         print(record)
         sleep(1)
+
+
+def init_producer(servers: list[str]) -> tuple[KafkaProducer, KafkaAdminClient]:
+    for i in range(20):
+        try:
+            producer = KafkaProducer(bootstrap_servers=servers)
+            admin = KafkaAdminClient(bootstrap_servers=servers)
+            logger.info("SUCCESS: instantiated Kafka admin and producer")
+            return producer, admin
+            # break
+        except Exception as e:
+            logger.exception(
+                f"Trying to instantiate admin and producer with bootstrap servers {servers} with error {e}"
+            )
+            sleep(10)
+            pass
+
+
+def create_topic(admin: KafkaAdminClient, topic_name: str) -> None:
+    try:
+        # Create Kafka topic
+        topic = NewTopic(name=topic_name, num_partitions=3, replication_factor=1)
+        admin.create_topics([topic])
+        logger.info(f"Topic {topic_name} created")
+    except Exception as e:
+        logger.exception(str(e))
+        pass
 
 
 def teardown_stream(topic_name, servers=["localhost:9092"]):
