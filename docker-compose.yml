@@ -24,6 +24,18 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - zookeeper
+      - broker 
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:29092
+
   redis:
     image: redis
     container_name: redis
@@ -37,9 +49,36 @@ services:
       context: ./services/kafka-producer/
       dockerfile: Dockerfile
     environment:
-      - KAFKA_BROKER_ADDRESS=redpanda:9092
-      - INPUT=raw_transactions
+      - KAFKA_BROKER_ADDRESS=broker:29092
+      - KAFKA_OUTPUT_TOPIC=raw_transactions
     depends_on:
       - broker 
     env_file:
       - ./services/kafka-producer/.env
+
+  feature-transformer:
+    container_name: feature-transformer
+    restart: always
+    build:
+      context: ./services/feature-transformer/
+      dockerfile: Dockerfile
+      args:
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+        AWS_REGION: ${AWS_REGION}
+        AWS_DOMAIN: ${AWS_DOMAIN}
+        AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
+        AWS_CODEARTIFACT_REPOSITORY: ${AWS_CODEARTIFACT_REPOSITORY}
+    environment:
+      - KAFKA_BROKER_ADDRESS=broker:29092
+      - KAFKA_INPUT_TOPIC=raw_transactions
+      - KAFKA_OUTPUT_TOPIC=processed_transactions
+    depends_on:
+      - broker
+      - kafka-producer
+    env_file:
+      - .env
+    
+
+
+
