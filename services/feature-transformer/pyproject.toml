@@ -1,0 +1,16 @@
+[project]
+name = "feature-transformer"
+version = "0.1.0"
+description = "Service that transforms features streamed in real-time"
+readme = "README.md"
+requires-python = ">=3.12.0"
+dependencies = [
+    "kafka-python-ng==2.2.2",
+    "polars>=1.21.0",
+    "rich>=13.9.4",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.9.3",
+]
