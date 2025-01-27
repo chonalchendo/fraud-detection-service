@@ -1,5 +1,5 @@
-import argparse
 import json
+import os
 from time import sleep
 
 import polars as pl
@@ -11,23 +11,6 @@ from producer.logger import get_logger
 from producer.settings import storage_options
 
 logger = get_logger(__name__)
-
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-m",
-    "--mode",
-    default="setup",
-    choices=["setup", "teardown"],
-    help="Whether to setup or teardown a Kafka topic with driver stats events. Setup will teardown before beginning emitting events.",
-)
-parser.add_argument(
-    "-b",
-    "--bootstrap_servers",
-    default="localhost:9092",
-    help="Where the bootstrap server is",
-)
-
-args = parser.parse_args()
 
 
 def create_stream(topic_name: str, servers: list[str]) -> None:
@@ -92,9 +75,9 @@ def teardown_stream(topic_name, servers=["localhost:9092"]):
 
 
 if __name__ == "__main__":
-    parsed_args = vars(args)
-    mode = parsed_args["mode"]
-    servers = parsed_args["bootstrap_servers"]
-    teardown_stream("transactions", [servers])
-    if mode == "setup":
-        create_stream("transactions", [servers])
+    # load in environment variables
+    SERVERS = os.getenv("KAFKA_BROKER_ADDRESS", "localhost:9092")
+    KAFKA_OUTPUT_TOPIC = os.getenv("KAFKA_OUTPUT_TOPIC", "raw_transactions")
+
+    # start stream
+    create_stream(KAFKA_OUTPUT_TOPIC, [SERVERS])
