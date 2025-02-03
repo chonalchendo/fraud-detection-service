@@ -8,10 +8,11 @@ how various tools and resources are used to make the system possible.
 
 # 📑 Contents
 
-[Overview](#overview) \
-[System Design](#system-design) \
+[📑Overview](#overview) \
+[🧩System Design](#system-design) \
 [Project Structure](#project-structure) \
-[Setup](#setup)
+[ ⚙️Setup](#setup) \
+[🎯Getting Started](#getting-started)
 
 ---
 
@@ -53,6 +54,20 @@ The project is split into three areas:
 
 ![System Design](images/fraud-detection-ml-system.drawio.png)
 
+---
+
+# 🏗 Project Structure
+
+```
+.                                                                                                                            ├── LICENSE
+├── Makefile                                                                                                                 ├── README.md
+├── docker-compose.yml                                                                                                       ├── docs
+├── images
+├── infra
+├── packages
+├── pipelines
+└── services
+```
 ---
 
 # ⚙️ Setup
