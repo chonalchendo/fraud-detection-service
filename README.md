@@ -10,7 +10,7 @@ how various tools and resources are used to make the system possible.
 
 [📑Overview](#overview) \
 [🧩System Design](#system-design) \
-[Project Structure](#project-structure) \
+[🏗Project Structure](#project-structure) \
 [ ⚙️Setup](#setup) \
 [🎯Getting Started](#getting-started)
 
@@ -26,27 +26,27 @@ The project is split into three areas:
 
 ## 🧰 Services
 
-| Service             | Description                                                                                                                                      |
+| **Service**             | **Description**                                                                                                                                      |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Kafka Producer      | Streams data to the `Kafka` broker                                                                                                               |
-| Feature Transformer | Kafka consumer that processes data in real-time using `polars`                                                                                   |
-| Feature Store       | Feature storage infrastructure layer to store online and offline features in low latency environment - infrastructure orchestrated using `Feast` |
-| Prediction API      | Prediction service, built using `FastAPI`, used to serve model predictions to predict fraud on real-time data                                    |
-| Application         | Frontend UI developed in `Streamlit` to serve results to stakeholders                                                                            |
+| **Kafka Producer**      | Streams data to the `Kafka` broker                                                                                                               |
+| **Feature Transformer** | Kafka consumer that processes data in real-time using `polars`                                                                                   |
+| **Feature Store**       | Feature storage infrastructure layer to store online and offline features in low latency environment - infrastructure orchestrated using `Feast` |
+| **Prediction API**      | Prediction service, built using `FastAPI`, used to serve model predictions to predict fraud on real-time data                                    |
+| **Application**         | Frontend UI developed in `Streamlit` to serve results to stakeholders                                                                            |
 
 ## 📦 Packages
 
-| Package       | Description                                                           |
+| **Package**       | **Description**                                                           |
 | ------------- | --------------------------------------------------------------------- |
-| Data Package  | Package that provides data transformation logic in `polars`           |
-| Model Package | Package containing code to develop, build, and validate new ML models |
+| **Data Package**  | Package that provides data transformation logic in `polars`           |
+| **Model Package** | Package containing code to develop, build, and validate new ML models |
 
 ## 🚀 Pipelines
 
-| Pipeline            | Description                                                                                                                                    |
+| **Pipeline**            | **Description**                                                                                                                                    |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Training Pipeline   | Model training pipeline triggered at intervals or by data drift monitoring                                                                     |
-| Batch Data Pipeline | Pipeline to generate batch features needed at the point of online model serving - pipeline triggered to store latest bathces in online storage |
+| **Training Pipeline**   | Model training pipeline triggered at intervals or by data drift monitoring                                                                     |
+| **Batch Data Pipeline** | Pipeline to generate batch features needed at the point of online model serving - pipeline triggered to store latest bathces in online storage |
 
 ---
 
@@ -76,7 +76,7 @@ The project is split into three areas:
 
 To setup the project locally, you'll need the following tools:
 
-| Tool           | Version | Purpose                                                  | Installation Link                                   |
+| **Tool**           | **Version** | **Purpose**                                                  | **Installation** Link                                   |
 | -------------- | ------- | -------------------------------------------------------- | --------------------------------------------------- |
 | Python         | 3.12    | Programming language runtime                             | [Download](https://www.python.org/downloads/)       |
 | uv             | ≥ 0.5.6 | Python package installer and virtual environment manager | [Download](https://github.com/astral-sh/uv)         |
