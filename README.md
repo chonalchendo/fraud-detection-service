@@ -1,17 +1,21 @@
-# fraud-detection-service
+# 🕵 Real-time Fraud Detection ML System
 
 This project aims to be an end-to-end online prediction service to detect fraud.
 The project is intended to provide an overview of how online prediction systems work, and to understand
 how various tools and resources are used to make the system possible.
 
-## Contents
+---
+
+# 📑 Contents
 
 [Overview](#overview) \
 [System Design](#system-design) \
 [Project Structure](#project-structure) \
-[Setup](#setup) \
+[Setup](#setup)
 
-## Overview
+---
+
+# 📑 Overview
 
 The project is split into three areas:
 
@@ -19,7 +23,7 @@ The project is split into three areas:
 - `packages` -> Custom packages used to provide data processing and model training logic.
 - `pipelines` -> Automated pipelines scheduled to run at regular intervals including model retraining and batch feature generation.
 
-### Services
+## 🧰 Services
 
 | Service             | Description                                                                                                                                      |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -29,27 +33,31 @@ The project is split into three areas:
 | Prediction API      | Prediction service, built using `FastAPI`, used to serve model predictions to predict fraud on real-time data                                    |
 | Application         | Frontend UI developed in `Streamlit` to serve results to stakeholders                                                                            |
 
-### Packages
+## 📦 Packages
 
 | Package       | Description                                                           |
 | ------------- | --------------------------------------------------------------------- |
 | Data Package  | Package that provides data transformation logic in `polars`           |
 | Model Package | Package containing code to develop, build, and validate new ML models |
 
-### Pipelines
+## 🚀 Pipelines
 
 | Pipeline            | Description                                                                                                                                    |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Training Pipeline   | Model training pipeline triggered at intervals or by data drift monitoring                                                                     |
 | Batch Data Pipeline | Pipeline to generate batch features needed at the point of online model serving - pipeline triggered to store latest bathces in online storage |
 
-## System Design
+---
+
+# 🧩 System Design
 
 ![System Design](images/fraud-detection-ml-system.drawio.png)
 
-## Setup
+---
 
-### Tools
+# ⚙️ Setup
+
+## Tools
 
 To setup the project locally, you'll need the following tools:
 
@@ -60,7 +68,9 @@ To setup the project locally, you'll need the following tools:
 | Docker Desktop | 4.37.2  | Run the project in a containerised environment           | [Download](https://docs.docker.com/engine/install/) |
 | GNU Make       | ≥ 3.81  | Build automation tool                                    | [Download](https://www.gnu.org/software/make/)      |
 
-## Getting Started
+---
+
+# 🎯 Getting Started
 
 To start the services we need to run the `docker-compose.yml`. We can do this by running the following `make` commands.
 Make sure `Docker Desktop` is running in the background.
